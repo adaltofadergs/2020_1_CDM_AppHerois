@@ -1,5 +1,6 @@
 package br.pro.appherois_2020_1;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -11,8 +12,15 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ListView lvLista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,15 +29,48 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        lvLista = findViewById(R.id.lvLista);
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+     //           Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+     //                   .setAction("Action", null).show();
+                Intent intent = new Intent(MainActivity.this, FormularioActivity.class);
+                intent.putExtra("acao", "inserir");
+                startActivity( intent );
+            }
+        });
+
+        lvLista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Heroi heroi = (Heroi) lvLista.getItemAtPosition( position );
+                Intent intent = new Intent(MainActivity.this, FormularioActivity.class);
+                intent.putExtra("acao", "editar");
+                intent.putExtra("idHeroi", heroi.getId() );
+                startActivity( intent );
+
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        carregarHerois();
+    }
+
+
+
+
+    private void carregarHerois(){
+        List<Heroi> listaHerois = HeroiDAO.listar( this );
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaHerois);
+        lvLista.setAdapter( adapter );
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
