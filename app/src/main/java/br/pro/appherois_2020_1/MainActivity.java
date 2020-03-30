@@ -1,11 +1,13 @@
 package br.pro.appherois_2020_1;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -54,7 +56,37 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        lvLista.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Heroi heroi = (Heroi) lvLista.getItemAtPosition( position );
+
+                excluir( heroi );
+
+                return true;
+            }
+        });
+
     }
+
+    private void excluir(final Heroi heroiSelecionado ){
+        AlertDialog.Builder alerta = new AlertDialog.Builder(this);
+        alerta.setTitle("Atenção!");
+        alerta.setIcon(android.R.drawable.ic_dialog_alert);
+        alerta.setMessage("Você confirma a exclusão do heroi: " + heroiSelecionado.getNome() + "?");
+        alerta.setNeutralButton("Cancelar", null);
+
+        alerta.setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                HeroiDAO.excluir(MainActivity.this, heroiSelecionado.getId() );
+                carregarHerois();
+            }
+        });
+        alerta.show();
+    }
+
 
     @Override
     protected void onResume() {
